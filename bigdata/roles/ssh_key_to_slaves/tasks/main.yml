@@ -1,0 +1,24 @@
+
+- stat: path={{home_dir}}/.ssh/id_rsa
+  register: p
+
+- name: ensure SSH key is generated
+  shell: echo -e  'y\n'| ssh-keygen -t rsa -f {{home_dir}}/.ssh/id_rsa -N ''
+  when: p.stat.exists == False 
+
+- name: fetch public ssh key
+  shell: cat ~/.ssh/id_rsa.pub
+  register: ssh_keys
+
+- name: deploy ssh key to all servers
+  lineinfile:
+    dest: {{home_dir}}/.ssh/authorized_keys
+    line: '{{ ssh_keys.stdout }}'
+    owner: user_name
+    group: user_name
+    mode: 0640
+    state: present 
+  delegate_to: "{{item}}"
+  with_items:
+    - "{{groups['bigdata_slaves']}}"
+    - "{{groups['bigdata_masters']}}"

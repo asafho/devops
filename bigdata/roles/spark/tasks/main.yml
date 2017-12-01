@@ -1,0 +1,58 @@
+- include_vars: variables.yml
+
+
+- name: delete old spark directories
+  become: yes
+  shell: rm -rf {{home_dir}}/spark*
+
+- name: Download latest spark 1.6.2 distribution
+  get_url: url=http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz dest="{{home_dir}}/spark-1.6.2-bin-hadoop2.6.tgz"
+
+- name: Download latest spark 2.1.1 distribution
+  get_url: url=http://d3kbcqa49mib13.cloudfront.net/spark-2.1.1-bin-hadoop2.7.tgz dest="{{home_dir}}/spark-2.1.1-bin-hadoop2.7.tgz"
+
+- name: open tar
+  shell: "{{item}}"
+  args: chdir="{{home_dir}}"
+  with_items:
+    - tar xvf spark-1.6.2-bin-hadoop2.6.tgz
+    - mv spark-1.6.2-bin-hadoop2.6 spark
+    - tar xvf spark-2.1.1-bin-hadoop2.7.tgz
+    - mv spark-2.1.1-bin-hadoop2.7 spark2
+    - rm -rf spark*.tgz
+
+- name: create spark-defaults.conf
+  shell: "cp -v ~/{{item}}/conf/spark-defaults.conf.template ~/{{item}}/conf/spark-defaults.conf"
+  with_items:
+    - spark
+    - spark2
+
+- name: add fields to spark-defaults.conf
+  blockinfile:
+      dest: "{{home_dir}}/{{item}}/conf/spark-defaults.conf"
+      block: |
+        spark.eventLog.enabled true
+        spark.eventLog.dir v3io:///spark-history
+        spark.history.fs.logDirectory v3io:///spark-history
+        spark.yarn.historyServer.address http://{{host_name}}:18080
+        spark.history.ui.port 18080
+        spark.history.provider org.apache.spark.deploy.history.FsHistoryProvider
+        spark.history.fs.cleaner.enabled=false
+        spark.history.fs.cleaner.interval=86400
+        spark.history.fs.cleaner.maxAge=604800
+        spark.history.fs.update.interval=10
+        spark.history.retainedApplications=50
+        spark.executor.instances={{ slaves_count|int * 4  }}
+        spark.jars={{hadoop_dir}}/share/hadoop/hdfs/lib/v3io-hcfs.jar,{{home_dir}}/{{item}}/lib/v3io-spark-streaming.jar,{{home_dir}}/{{item}}/lib/v3io-spark-object-dataframe.jar
+        spark.driver.extraLibraryPath="${HADOOP_CONF_DIR}"
+        spark.executorEnv.HADOOP_CONF_DIR="${HADOOP_CONF_DIR}"
+  with_items:
+    - spark
+    - spark2
+
+- name: Rename spark-env file
+  command: mv {{home_dir}}/{{item}}/conf/spark-env.sh.template {{home_dir}}/{{item}}/conf/spark-env.sh
+  ignore_errors: yes
+  with_items:
+    - spark
+    - spark2

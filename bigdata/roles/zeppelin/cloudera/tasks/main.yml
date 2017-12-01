@@ -1,0 +1,11 @@
+- include_vars: variables.yml
+
+- name: Set zeppelin properties in zeppelin-env.sh
+  lineinfile: dest={{home_dir}}/zeppelin/conf/zeppelin-env.sh line='{{item}}' state=present 
+  with_items:
+   - export JAVA_HOME=${JAVA_HOME}
+   - export HADOOP_CONF_DIR=/etc/hadoop/conf:/etc/hive/conf
+   - export HADOOP_HOME=/opt/cloudera/parcels/CDH/lib/hadoop-hdfs
+   - export SPARK_HOME=/opt/cloudera/parcels/CDH/lib/spark
+   - export MASTER=yarn-client
+   - export SPARK_SUBMIT_OPTIONS="--jars ${HADOOP_HOME}/share/hadoop/hdfs/lib/v3io-hcfs.jar,${SPARK_HOME}/lib/v3io-spark-object-dataframe.jar,${SPARK_HOME}/lib/v3io-spark-streaming.jar --conf spark.driver.extraClassPath=${HADOOP_HOME}/share/hadoop/hdfs/lib/v3io-hcfs.jar:${SPARK_HOME}/lib/v3io-spark-object-dataframe.jar:${SPARK_HOME}/lib/v3io-spark-streaming.jar --conf spark.executor.extraClassPath=${HADOOP_HOME}/share/hadoop/hdfs/lib/v3io-hcfs.jar:${SPARK_HOME}/lib/v3io-spark-object-dataframe.jar:${SPARK_HOME}/lib/v3io-spark-streaming.jar"

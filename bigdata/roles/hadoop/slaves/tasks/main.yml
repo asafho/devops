@@ -1,0 +1,12 @@
+- include_vars: variables.yml
+
+
+- name: Delete datanode directory
+  become: yes
+  file: path={{home_dir}}/hadoop/hadoop-data/user_name/hdfs/datanode state=absent
+  ignore_errors: yes
+
+
+- name: mkdir datanode directory
+  become: yes
+  file: path={{home_dir}}/hadoop/hadoop-data/user_name/hdfs/datanode state=directory

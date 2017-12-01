@@ -1,0 +1,30 @@
+chef ui <ip>:443
+
+chef generate app chef-repo
+
+https://www.opscode.com/chef/install.sh
+chef app genereate <appname>
+cd <appname>
+mkdir -p .chef
+pull user.pem and org.pem
+touch knife.rb
+#######################example 
+current_dir = File.dirname(__FILE__)
+log_level                 :info
+log_location              STDOUT
+node_name                 “username”
+client_key                "#{current_dir}/username.pem"
+chef_server_url           "https://192.168.1.30/organizations/orgname”
+cookbook_path             ["#{current_dir}/../cookbooks"]
+##########################
+knife fetch 
+knife check
+# may add .ssh/config file to ssh to hostname
+########example config
+Asafs-MacBook-Pro-2:.chef asafh$ cat ~/.ssh/config 
+Host ubuntu
+    HostName 192.168.1.30
+    Port 22
+    User username
+################################
+knife check

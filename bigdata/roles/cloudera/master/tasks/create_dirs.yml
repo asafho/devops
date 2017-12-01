@@ -1,0 +1,29 @@
+
+
+- name: create directories
+  file:
+    path: "{{item.path}}"
+    owner: "{{item.owner}}"
+    group: "{{item.group}}"
+    mode: "{{item.mode}}"
+    state: directory
+  with_items:
+    - {path: '/tmp/fuse_root/tmp',              owner: 'hdfs',    group: 'hdfs',    mode: '1777'}
+    - {path: '/tmp/fuse_root/user',             owner: 'hdfs',    group: 'hdfs',    mode: '755'}
+    - {path: '/tmp/fuse_root/hbase',            owner: 'hbase',   group: 'hbase',   mode: '755'}
+    - {path: '/tmp/fuse_root/user/history',     owner: 'mapred',  group: 'hadoop',  mode: '777'}
+    - {path: '/tmp/fuse_root/tmp/logs',         owner: 'mapred',  group: 'hadoop',  mode: '775'}
+    - {path: '/tmp/fuse_root/user/spark',       owner: 'spark',   group: 'spark',   mode: '751'}
+    - {path: '/tmp/fuse_root/user/spark/applicationHistory', owner: 'spark', group: 'spark', mode: '0777'}
+    - {path: '/tmp/fuse_root/user/yarn',        owner: 'yarn',    group: 'hadoop', mode: '755'}
+    - {path: '/tmp/fuse_root/user/history/done/yarn', owner: 'yarn', group: 'hadoop', mode: '755'}
+    - {path: '/tmp/fuse_root/user/history/done_intermediate/yarn', owner: 'yarn', group: 'hadoop', mode: '755'}
+    - {path: '/tmp/fuse_root/user/user_name',     owner: 'user_name', group: 'user_name', mode: '777'}
+    - {path: '/tmp/fuse_root/user/history/done_intermediate/user_name', owner: 'user_name', group: 'user_name', mode: '777'}
+    - {path: '/tmp/fuse_root/user/history/done/2017', owner: 'mapred', group: 'hadoop', mode: '777'}
+    - {path: '/tmp/fuse_mount/user/hue',        owner: 'hue',     group: 'hue',     mode: '755'}
+    - {path: '/tmp/fuse_mount/user/oozie',      owner: 'oozie',   group: 'oozie',   mode: '775'}
+    - {path: '/tmp/fuse_mount/user/hive',       owner: 'hive',    group: 'hive',    mode: '775'}
+    - {path: '/tmp/fuse_mount/user/hive/warehouse', owner: 'hive',group: 'hive',    mode: '1777'}
+    - {path: '/tmp/fuse_mount/tmp/hive',        owner: 'hive',    group: 'hive',    mode: '777'}
+    - {path: '/tmp/fuse_mount/hive/warehouse',  owner: 'hive',    group: 'hive',    mode: '777'}

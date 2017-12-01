@@ -1,0 +1,48 @@
+- include_vars: variables.yml
+
+- name: verify 'user_name' is sudo
+  become: yes
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    line: 'user_name ALL=(ALL) NOPASSWD:ALL'
+    insertafter: EOF
+    validate: 'visudo -cf %s'
+
+
+- set_fact: master_ip={{ groups[['bigdata_masters'][0]][0] }}
+- set_fact: master_name={{ hostvars[master_ip]['host_name'] }}
+- set_fact: slaves={{ groups['bigdata_slaves'] }}
+
+- name: add master ip to /etc/hosts
+  become: yes
+  lineinfile: dest=/etc/hosts line="{{master_ip}} {{master_name}}" regexp="{{master_ip}} {{master_name}}"
+
+- name: add hostname to /etc/hostname
+  become: yes
+  hostname: name="{{host_name}}"
+
+
+- name: add slaves to /etc/hosts
+  become: yes
+  lineinfile: dest=/etc/hosts line="{{item}} {{ hostvars[item]['host_name'] }}" regexp="{{item}} {{ hostvars[item]['host_name'] }}"
+  with_items: "{{ slaves }}"
+
+- name: verify .ssh directory
+  file:
+    path: {{home_dir}}/.ssh
+    owner: user_name
+    group: user_name
+    mode: 0700
+    state: directory
+    
+- file:
+    path: {{home_dir}}/.ssh/authorized_keys
+    owner: user_name
+    group: user_name
+    mode: 0640
+    state: touch
+
+- name: set strictHostKeyChecking
+  become: yes
+  lineinfile: dest=/etc/ssh/ssh_config line="strictHostKeyChecking no" regexp="strictHostKeyChecking"

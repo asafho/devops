@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Author: Asaf H
+# Email: asafho@gmail.com
+# Nagios Usage: check_nrpe!check_docker_version!_major_version _api_version
+# Usage: ./check_docker_version.sh _major_version _api_version
+#
+#   OK - 
+#   WARNING - docker daemon is down
+#   CRITICAL - wrong version
+#   UNKNOWN - does not exist
+#
+
+_major_version=$1
+_api_version=$2
+
+daemon_status=$(service docker status | grep Active)
+
+if [[ "$daemon_status" != *"active (running)"* ]]; then
+  echo "WARNING - docker daemon is down"
+  exit 1
+fi
+
+docker_version=$(docker version | grep Version | head -1)
+docker_api=$(docker version | grep API | head -1)
+
+if [[ "$docker_version" != *"$_major_version"* ]]; then
+  echo "CRITICAL - wrong docker version"
+  exit 2
+fi
+
+if [[ "$docker_api" != *"$_api_version"* ]]; then
+  echo "CRITICAL - wrong docker api version"
+  exit 2
+fi
+
+echo "OK - docker version satisfied"

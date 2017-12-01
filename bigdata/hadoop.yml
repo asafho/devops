@@ -1,0 +1,17 @@
+- hosts: bigdata_masters, bigdata_slaves
+  roles:
+      - common
+      - hadoop/common
+
+
+- hosts: bigdata_masters
+  roles:
+      - { role: ssh_key_to_slaves }
+      - { role: hadoop/master }
+      - { role: spark }
+      - { role: zeppelin/common }
+      - { role: zeppelin/vanilla }
+      
+- hosts: bigdata_slaves
+  roles:
+      - hadoop/slaves

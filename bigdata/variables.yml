@@ -1,0 +1,8 @@
+---
+   user_name: user_name
+   home_dir: "/home/{{user_name}}"
+   slaves_count: "{{ groups['bigdata_slaves'] | length }}"
+   hadoop_dir: "{{home_dir}}/hadoop"
+   cloudera_version: 5.9.2
+   zeppelin_version: 0.7.1
+   

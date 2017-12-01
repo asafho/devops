@@ -1,0 +1,11 @@
+add node to chef server:
+knife bootstrap <ip> -x <user> -P <pass> --sudo -N <name>
+tag create <name> <tagname>
+
+
+
+list nodes by tag (example: builders)
+knife search node "tags:builders"
+or 
+knife search builders
+

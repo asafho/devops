@@ -1,0 +1,25 @@
+- include_vars: variables.yml
+
+- name: remove old zeppelin
+  become: true
+  shell: rm -rf zeppelin*
+
+- name: Download zeppelin distribution
+  get_url: 
+     url: http://apache.spd.co.il/zeppelin/zeppelin-{{zeppelin_version}}/zeppelin-{{zeppelin_version}}-bin-all.tgz
+     dest: "{{home_dir}}/zeppelin-{{zeppelin_version}}-bin-all.tgz"
+
+
+- name: open tar
+  shell: "{{item}}"
+  args: chdir="{{home_dir}}"
+  with_items:
+    - tar xvf zeppelin-{{zeppelin_version}}-bin-all.tgz
+    - mv zeppelin-{{zeppelin_version}}-bin-all zeppelin
+    - rm -rf zeppelin-*-bin-all.tgz
+
+- name: copy template
+  command: cp {{home_dir}}/zeppelin/conf/{{item}}.template {{home_dir}}/zeppelin/conf/{{item}}
+  with_items:
+    - zeppelin-env.sh
+    - zeppelin-site.xml

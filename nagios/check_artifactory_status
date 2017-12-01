@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Author: Asaf H
+# Email: asafho@gmail.com
+# Nagios Usage: check_nrpe!check_artifactory_status!
+# Usage: ./check_artifactory_status.sh
+#
+#   OK - 
+#   CRITICAL - Artifactory is down
+#   UNKNOWN - does not exist
+#
+
+art_status=$(service artifactory status | grep Active)
+
+if [[ "$art_status" != *"active (running)"* ]]; then
+  echo "CRITICAL - Artifactory is down"
+  exit 2
+fi
+
+echo "OK - Artifactory is up and running"

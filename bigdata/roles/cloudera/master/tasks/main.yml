@@ -1,0 +1,23 @@
+- include_vars: variables.yml
+
+- name: copy cloudera-manager.repo to yum repo
+  template: src=templates/cloudera-manager.repo.j2 dest=/etc/yum.repos.d/cloudera-manager.repo
+
+
+#- name: yum clean all
+#  command: yum clean all
+  
+- name: install yum packages
+  shell: yum install -y {{item}}
+  with_items:
+    - oracle-j2sdk1*
+    - cloudera*
+
+- name: start cloudera-scm-server
+  shell: "{{item}}"
+  with_items:
+    - systemctl start cloudera-scm-server-db
+    - systemctl start cloudera-scm-server
+    
+#- include: create_dirs.yml
+  

@@ -1,0 +1,49 @@
+- include_vars: variables.yml
+
+- name: delete old hadoop temp directories
+  become: yes
+  shell: rm -rf {{item}}
+  with_items:
+    - /tmp/hadoop*
+    - "{{home_dir}}/hadoop*"
+    - "{{home_dir}}/namenode"
+    - "{{home_dir}}/datanode"
+
+- name: install yum packages
+  become: yes
+  yum: name={{item}} state=latest
+  with_items:
+    - wget
+    - libselinux-python
+    - java-1.7.0-openjdk-devel.x86_64
+    - dstat
+
+
+- name: Download latest Hadoop distribution
+  get_url: url=http://apache.spd.co.il/hadoop/common/hadoop-2.7.2/hadoop-2.7.2.tar.gz dest="{{home_dir}}/hadoop-2.7.2.tar.gz"
+
+- name: open tar
+  shell: "{{item}}"
+  args: chdir="{{home_dir}}"
+  with_items:
+    - tar xvf hadoop-2.7.2.tar.gz
+    - mv hadoop-2.7.2 hadoop
+
+- shell: mv hadoop/hadoop-2.7.2/* hadoop/
+  ignore_errors: yes
+  
+- name: copy hadoop.sh into /etc/profile.d/
+  become: yes
+  template: src=templates/hadoop.j2 dest=/etc/profile.d/hadoop.sh
+
+- name: create directories
+  file: path={{home_dir}}/{{item}} state=directory mode=0755
+  with_items:
+    - namenode
+    - datanode
+    
+- name: copy xml's
+  template: src=templates/{{item}}.j2 dest={{home_dir}}/hadoop/etc/hadoop/{{item}}.xml
+  with_items:
+    - hdfs-site
+    - yarn-site

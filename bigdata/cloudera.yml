@@ -1,0 +1,12 @@
+- hosts: bigdata_masters, bigdata_slaves
+  roles:
+    - { role: common, become: yes }
+    - { role: cloudera/common, become: yes }
+
+    
+- hosts: bigdata_masters
+  roles:
+    - { role: ssh_key_to_slaves }
+    - { role: cloudera/master, become: yes }
+    - { role: zeppelin/common }
+    - { role: zeppelin/cloudera }
